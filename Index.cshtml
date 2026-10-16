@@ -1,0 +1,1183 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0716">
+    <title>20/10 · IT & IS VPIC1</title>
+    <style>
+        :root {
+            --bg: #0d0716;
+            --rose: #ff7eb6;
+            --gold: #ffd89a;
+            --lil: #c8a6ff;
+            --tx: #fbeefa;
+            box-sizing: border-box;
+            color-scheme: dark
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            overscroll-behavior: none
+        }
+
+        body {
+            background: radial-gradient(ellipse at 50% 30%, #3a1752, #150a24 55%, #07040e);
+            color: var(--tx);
+            font-family: "Be Vietnam Pro", "Segoe UI", Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            -webkit-text-size-adjust: 100%
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none
+        }
+
+        header {
+            position: relative;
+            z-index: 3;
+            padding: 16px 16px 0;
+            width: 100%
+        }
+
+        .org {
+            font-size: 12px;
+            letter-spacing: .14em;
+            color: var(--lil)
+        }
+
+        h1 {
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: clamp(25px, 6.4vw, 60px);
+            line-height: 1.2;
+            margin: 6px auto 0;
+            max-width: 900px;
+            text-wrap: balance;
+            background: linear-gradient(90deg, #fff, var(--rose), var(--lil), #fff);
+            background-size: 250%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: sh 6s linear infinite
+        }
+
+        @@keyframes sh {
+            to {
+                background-position: 250%
+            }
+        }
+
+        .wish {
+            min-height: 4.4em;
+            margin: 8px auto 0;
+            max-width: 560px;
+            padding: 0 8px;
+            font-size: clamp(13px, 2.4vw, 18px);
+            line-height: 1.65;
+            color: #f0dcf6;
+            text-wrap: balance;
+            transition: opacity .6s, transform .6s
+        }
+
+            .wish.out {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+        .stage {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            flex: 1;
+            min-height: 200px;
+            perspective: 1100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: pan-y;
+            cursor: grab;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none
+        }
+
+            .stage:active {
+                cursor: grabbing
+            }
+
+        .ring {
+            position: relative;
+            width: var(--cw, 140px);
+            height: calc(var(--cw, 140px) * 1.32);
+            transform-style: preserve-3d;
+            will-change: transform
+        }
+
+        .card {
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid #ffffff55;
+            box-shadow: 0 0 22px #ff7eb655;
+            background: #222;
+            backface-visibility: visible;
+            -webkit-backface-visibility: visible;
+            transition: box-shadow .3s, border-color .3s
+        }
+
+            .card img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                pointer-events: none;
+                -webkit-user-drag: none;
+                transition: transform .5s
+            }
+
+            .card::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(160deg, #ffffff30, transparent 40%)
+            }
+
+        @@media (hover: hover) {
+            .card:hover {
+                border-color: var(--gold);
+                box-shadow: 0 0 40px #ffd89acc
+            }
+
+                .card:hover img {
+                    transform: scale(1.15)
+                }
+
+            button:hover {
+                transform: translateY(-2px)
+            }
+        }
+
+        .hint {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            padding: 0 16px;
+            font-size: 12px;
+            color: #cdb9dc
+        }
+
+        footer {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            padding: 10px 16px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px
+        }
+
+        button {
+            font: inherit;
+            font-size: 14px;
+            color: #fff;
+            border: 1px solid #ffffff66;
+            border-radius: 30px;
+            padding: 12px 24px;
+            min-height: 44px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #d34f9b, #8257c8);
+            box-shadow: 0 0 24px #d34f9b66;
+            transition: transform .2s;
+            touch-action: manipulation
+        }
+
+            button:active {
+                transform: scale(.97)
+            }
+
+            button:focus-visible, input:focus-visible {
+                outline: 3px solid var(--gold);
+                outline-offset: 3px
+            }
+
+        .sig {
+            font-size: 12px;
+            color: #cdb9dc;
+            max-width: 520px;
+            line-height: 1.5;
+            text-wrap: balance
+        }
+
+            .sig b {
+                color: var(--rose)
+            }
+
+        #lb {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 20px;
+            background: #07040eee;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: .35s;
+            cursor: zoom-out
+        }
+
+            #lb.on {
+                opacity: 1;
+                visibility: visible
+            }
+
+            #lb img {
+                max-width: min(94vw, 900px);
+                max-height: 72dvh;
+                border-radius: 16px;
+                border: 3px solid var(--gold);
+                box-shadow: 0 0 60px #ff7eb699;
+                transform: scale(.8) rotate(-2deg);
+                transition: transform .5s cubic-bezier(.2, 1.3, .4, 1)
+            }
+
+            #lb.on img {
+                transform: none
+            }
+
+            #lb p {
+                font-size: clamp(14px, 3vw, 20px);
+                color: var(--gold);
+                text-align: center
+            }
+
+        /* ===== Lớp thiệp: chọn người -> phong bì ===== */
+        #env {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+            background: #07040ef5;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .4s, visibility .4s
+        }
+
+            /* canh giữa nhưng vẫn cuộn được khi nội dung dài (không bị cắt đầu) */
+            #env > :first-child {
+                margin-top: auto
+            }
+
+            #env > :last-child {
+                margin-bottom: auto
+            }
+
+            #env.on {
+                opacity: 1;
+                visibility: visible
+            }
+
+        /* --- bước chọn người --- */
+        #pick {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center
+        }
+
+        #env[data-step=pick] #pick {
+            display: flex
+        }
+
+        #env[data-step=pick] .eb, #env[data-step=pick] #eh, #env[data-step=pick] #envb {
+            display: none
+        }
+
+        #env[data-step=letter] #pick {
+            display: none
+        }
+
+        #pick h3 {
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: clamp(20px, 5.4vw, 28px);
+            color: var(--gold)
+        }
+
+        .grp {
+            font-size: 12px;
+            letter-spacing: .14em;
+            color: var(--lil);
+            margin-top: 8px
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            width: 100%
+        }
+
+        .chip {
+            padding: 10px 16px;
+            font-size: 14px;
+            box-shadow: none;
+            background: #ffffff14;
+            border-color: #ffffff55
+        }
+
+            .chip:active {
+                background: linear-gradient(135deg, #d34f9b, #8257c8)
+            }
+
+        @@media (hover: hover) {
+            .chip:hover {
+                background: linear-gradient(135deg, #d34f9b, #8257c8)
+            }
+        }
+
+        .guest {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 360px
+        }
+
+            .guest input {
+                flex: 1;
+                min-width: 0;
+                font: inherit;
+                font-size: 16px; /* >=16px để iOS không tự phóng to khi gõ */
+                color: #fff;
+                background: #ffffff14;
+                border: 1px solid #ffffff55;
+                border-radius: 30px;
+                padding: 10px 16px;
+                min-height: 44px
+            }
+
+                .guest input::placeholder {
+                    color: #cdb9dc
+                }
+
+            .guest button {
+                flex: none;
+                padding: 10px 18px
+            }
+
+        /* --- phong bì --- */
+        .eb {
+            --w: min(88vw, 400px);
+            --H: calc(var(--w) / 1.5);
+            --lh: min(62dvh, 460px);
+            position: relative;
+            flex: none;
+            width: var(--w);
+            height: var(--H);
+            margin-top: 0;
+            cursor: pointer;
+            transition: margin-top .7s ease
+        }
+
+            .eb.open {
+                margin-top: max(0px, calc(var(--lh) - var(--H) * .94 + 8px))
+            }
+
+            .eb .back, .eb .front, .eb .flap {
+                position: absolute;
+                left: 0;
+                width: 100%
+            }
+
+            .eb .back {
+                inset: 0;
+                background: #8c3a78;
+                border-radius: 10px;
+                box-shadow: 0 10px 50px #ff7eb655
+            }
+
+            .eb .front {
+                top: 0;
+                height: 100%;
+                z-index: 3;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #c8a6ff, #ff7eb6 55%, #e05a9c);
+                clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%)
+            }
+
+            .eb .flap {
+                top: 0;
+                height: 55%;
+                z-index: 4;
+                border-radius: 10px 10px 0 0;
+                background: linear-gradient(#f4a0cf, #d86aaa);
+                clip-path: polygon(0 0, 100% 0, 50% 100%);
+                transform-origin: top;
+                transition: transform .6s ease .05s, z-index 0s .3s
+            }
+
+            .eb.open .flap {
+                transform: rotateX(180deg);
+                z-index: 1
+            }
+
+        .seal {
+            position: absolute;
+            left: 50%;
+            top: 55%;
+            width: 50px;
+            height: 50px;
+            margin: -25px 0 0 -25px;
+            border-radius: 50%;
+            z-index: 6;
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            background: radial-gradient(circle at 35% 30%, #ffe9b5, #f0a93e);
+            box-shadow: 0 3px 14px #0006;
+            transition: opacity .3s, transform .4s;
+            animation: pul 1.6s ease-in-out infinite
+        }
+
+        .eb.open .seal {
+            opacity: 0;
+            transform: scale(.4);
+            animation: none
+        }
+
+        @@keyframes pul {
+            50% {
+                transform: scale(1.12)
+            }
+        }
+
+        /* --- lá thư --- */
+        .letter {
+            position: absolute;
+            left: 6%;
+            width: 88%;
+            bottom: 7%;
+            height: 62%;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: clamp(14px, 4vw, 26px) clamp(14px, 4.6vw, 30px);
+            border-radius: 10px;
+            color: #4a1d48;
+            background: linear-gradient(#fff4fa, #f6e8ff);
+            border: 2px solid #ffd89a;
+            box-shadow: 0 4px 24px #ff7eb64d;
+            font-family: "Be Vietnam Pro", "Segoe UI", Arial, sans-serif;
+            transition: height .9s cubic-bezier(.3, 1.1, .4, 1) .45s;
+            scrollbar-width: thin;
+            scrollbar-color: #d86aaa #f6e8ff;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch
+        }
+
+            .letter::-webkit-scrollbar {
+                width: 5px
+            }
+
+            .letter::-webkit-scrollbar-track {
+                background: #f6e8ff;
+                border-radius: 10px
+            }
+
+            .letter::-webkit-scrollbar-thumb {
+                background: #d86aaa;
+                border-radius: 10px
+            }
+
+        .eb.open .letter {
+            height: var(--lh);
+            bottom: 6%;
+            z-index: 5
+        }
+
+        .lph {
+            flex: none;
+            align-self: center;
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #ffd89a;
+            box-shadow: 0 0 20px #ff7eb680;
+            display: grid;
+            place-items: center;
+            font-size: 40px;
+            background: #fde6f3
+        }
+
+            .lph img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover
+            }
+
+            .lph.none img {
+                display: none
+            }
+
+        .letter h2 {
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: clamp(17px, 4.6vw, 23px);
+            line-height: 1.35;
+            text-align: center;
+            text-wrap: balance;
+            color: #b0327a;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e6b8d6
+        }
+
+        .letter p {
+            font-size: clamp(13px, 3.5vw, 15px);
+            line-height: 1.75;
+            text-align: left;
+            text-wrap: pretty;
+            overflow-wrap: break-word
+        }
+
+        .letter .to {
+            margin-top: auto;
+            padding-top: 6px;
+            text-align: right;
+            font-style: italic;
+            color: #7b3fb5
+        }
+
+        .envhint {
+            font-size: 13px;
+            color: var(--gold);
+            min-height: 1.4em;
+            text-align: center;
+            padding: 0 12px
+        }
+
+        .envbtns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap
+        }
+
+            .envbtns button {
+                padding: 9px 20px;
+                font-size: 13px;
+                background: transparent;
+                box-shadow: none;
+                opacity: .9
+            }
+
+        /* --- màn hình chào --- */
+        #gate {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 24px;
+            text-align: center;
+            background: radial-gradient(ellipse at 50% 35%, #3a1752, #150a24 60%, #07040e);
+            transition: opacity .7s, visibility .7s
+        }
+
+            #gate.off {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none
+            }
+
+            #gate .gi {
+                font-size: 56px
+            }
+
+            #gate h2 {
+                font-family: "Playfair Display", Georgia, serif;
+                font-size: clamp(26px, 7vw, 44px);
+                background: linear-gradient(90deg, #fff, var(--rose), var(--lil));
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent
+            }
+
+            #gate p {
+                max-width: 420px;
+                line-height: 1.7;
+                font-size: clamp(14px, 3.6vw, 17px);
+                color: #f0dcf6
+            }
+
+            #gate button {
+                margin-top: 8px;
+                font-size: 16px;
+                padding: 14px 28px
+            }
+
+        #mu {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top));
+            right: 12px;
+            z-index: 70;
+            padding: 8px 14px;
+            min-height: 40px;
+            font-size: 13px
+        }
+
+        /* màn hình thấp (điện thoại ngang, máy nhỏ) */
+        @@media (max-height: 640px) {
+            .eb {
+                --lh: min(56dvh, 460px)
+            }
+
+            #env {
+                gap: 10px
+            }
+
+            header {
+                padding-top: 10px
+            }
+
+            .wish {
+                min-height: 3.4em
+            }
+
+            .lph {
+                width: 64px;
+                height: 64px;
+                font-size: 28px
+            }
+
+            #gate .gi {
+                font-size: 40px
+            }
+        }
+
+        @@media (max-height: 520px) {
+            .wish, .sig {
+                display: none
+            }
+
+            .stage {
+                min-height: 150px
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .eb {
+                --w: 92vw
+            }
+
+            .letter {
+                left: 5%;
+                width: 90%
+            }
+
+            .org {
+                font-size: 11px
+            }
+
+            #mu {
+                padding: 6px 12px
+            }
+        }
+
+        @@media (prefers-reduced-motion: reduce) {
+            h1, .seal {
+                animation: none
+            }
+
+            .eb, .eb .flap, .letter {
+                transition-duration: .01s;
+                transition-delay: 0s
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="c"></canvas>
+
+    <audio id="bgm" loop preload="none" playsinline src="@Url.Content("~/content/ISIT/audio/nhac.mp3")"></audio>
+    <button id="mu" type="button" aria-pressed="false">🔇 Bật nhạc</button>
+
+    <div id="gate" role="dialog" aria-label="Màn hình chào">
+        <div class="gi">🌸</div>
+        <h2>Chúc mừng 20/10</h2>
+        <p>Phòng IT & IS VPIC1 có một món quà nhỏ gửi các bạn.<br>Bật nhạc để bắt đầu nhé!</p>
+        <button id="go" type="button">🎵 Bật nhạc &amp; vào xem</button>
+    </div>
+
+    <header>
+        <div class="org">PHÒNG IT & IS · VPIC1</div>
+        <h1>Chúc mừng ngày Phụ nữ Việt Nam 20/10</h1>
+        <p class="wish" id="w"></p>
+    </header>
+
+    <div class="stage" id="s">
+        <div class="ring" id="r"></div>
+    </div>
+    <div class="hint">Kéo ngang để xoay · chạm vào ảnh để xem lớn</div>
+
+    <footer>
+        <button id="b" type="button">💌 Mở thư chúc mừng 20/10</button>
+        <div class="sig">Từ các anh em IT & IS với <b>♥</b> — chúc các bạn gái luôn rạng rỡ</div>
+    </footer>
+
+    <div id="lb" role="dialog" aria-label="Xem ảnh lớn">
+        <img id="lbi" alt="Ảnh phóng to">
+        <p>🌸 Chúc mừng 20/10 — phòng IT & IS VPIC1 🌷</p>
+    </div>
+
+    <div id="env" role="dialog" aria-label="Thiệp chúc mừng 20/10" data-step="pick">
+        <div id="pick">
+            <h3>Bạn là ai nhỉ? 🌸</h3>
+            <div id="pl" style="width:100%"></div>
+        </div>
+
+        <div class="eb" id="eb" tabindex="0" role="button" aria-label="Bấm để mở phong bì">
+            <div class="back"></div>
+            <div class="letter" id="lt">
+                <div class="lph" id="lph"><img id="lphi" alt="Ảnh chân dung"><span id="lphe">🌸</span></div>
+                <h2 id="lh"></h2>
+                <p id="l1"></p>
+                <p id="l2"></p>
+                <p id="l3"></p>
+                <p class="to" id="lto">— Các anh em IT &amp; IS · VPIC1 —</p>
+            </div>
+            <div class="front"></div>
+            <div class="flap"></div>
+            <div class="seal">💖</div>
+        </div>
+        <div class="envhint" id="eh">Chạm vào phong bì để mở thiệp ✨</div>
+        <div class="envbtns">
+            <button id="envb" type="button">← Chọn lại</button>
+            <button id="envx" type="button">Đóng</button>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            const IMG_BASE = '@Url.Content("~/content/ISIT/images/")';
+            const PB = '@Url.Content("~/content/ISIT/images/chandung/")';
+
+            const IM = [1, 2, 3, 4, 5].map(i => IMG_BASE + "anh" + i + ".jpg");
+
+            const W = [
+                "Chúc các chị em phòng IT & IS luôn xinh đẹp, rạng rỡ như hoa mùa thu 🌸",
+                "Cảm ơn các bạn đã làm cho đội ngũ VPIC1 thêm mạnh mẽ, ấm áp và nhiều tiếng cười 💖",
+                "Chúc sức khỏe, hạnh phúc, bình an và luôn được yêu thương 🌷",
+                "Không có bug nào đáng lo khi có các bạn ở đây — chúc 20/10 thật trọn vẹn ✨",
+                "Chúc các bạn luôn tự tin tỏa sáng, thành công và may mắn trong mọi việc 💐"
+            ];
+
+            const mobile = matchMedia("(max-width:640px)").matches || matchMedia("(pointer:coarse)").matches;
+            const rm = matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+            // ===== Canvas (khai báo sớm) =====
+            const c = document.getElementById("c"), x = c.getContext("2d");
+            let P = [], S = [], F = [];
+
+            // ===== Vòng ảnh 3D =====
+            const ring = document.getElementById("r"), st = document.getElementById("s"), N = 8;
+            const cards = [];
+            let R = 200;
+            function size() {
+                // cỡ thẻ theo màn hình, bán kính đủ lớn để các thẻ không chồng nhau
+                const h = st.clientHeight || 260;
+                const cw = Math.max(96, Math.min(innerWidth * .36, 190, (h - 24) / 1.32));
+                R = Math.round(cw / (2 * Math.tan(Math.PI / N)) * 1.1);
+                ring.style.setProperty("--cw", cw + "px");
+                cards.forEach((d, i) => d.style.transform = `rotateY(${i * 360 / N}deg) translateZ(${R}px)`);
+            }
+            for (let i = 0; i < N; i++) {
+                const d = document.createElement("div");
+                d.className = "card";
+                const im = new Image();
+                im.decoding = "async";
+                if (i > 0) im.loading = "lazy";
+                im.src = IM[i % IM.length];
+                im.alt = "Ảnh kỷ niệm phòng IT & IS";
+                im.draggable = false;
+                d.appendChild(im);
+                ring.appendChild(d);
+                cards.push(d);
+            }
+            size();
+            addEventListener("resize", size);
+            addEventListener("orientationchange", () => setTimeout(size, 250));
+
+            let ang = 0, vel = .25, drag = false, lx = 0, tilt = 0, hov = false, sx = 0, dt = null;
+            st.addEventListener("pointerover", e => { if (e.pointerType === "mouse") hov = !!e.target.closest(".card") });
+            st.addEventListener("pointerleave", () => hov = false);
+            st.addEventListener("pointerdown", e => {
+                drag = true; sx = lx = e.clientX;
+                dt = e.target.closest(".card");
+                try { st.setPointerCapture(e.pointerId) } catch (_) { }
+            });
+            st.addEventListener("pointermove", e => {
+                if (drag) { const dx = e.clientX - lx; lx = e.clientX; ang += dx * .4; vel = dx * .15 }
+                if (e.pointerType === "mouse") tilt = (e.clientY / innerHeight - .5) * -14;
+            });
+            const lb = document.getElementById("lb"), lbi = document.getElementById("lbi");
+            st.addEventListener("pointerup", e => {
+                drag = false;
+                if (dt && Math.abs(e.clientX - sx) < 8) {
+                    pop();
+                    lbi.src = dt.querySelector("img").src;
+                    lb.classList.add("on");
+                    for (let i = 0; i < (mobile ? 20 : 40); i++) petal(Math.random() * c.width, c.height * .9, true);
+                }
+                dt = null;
+            });
+            st.addEventListener("pointercancel", () => { drag = false; dt = null });
+            lb.onclick = () => lb.classList.remove("on");
+
+            (function loop() {
+                if (!drag) { ang += hov ? 0 : vel; vel += (.25 - vel) * .02 }
+                ring.style.transform = `translateZ(-${R}px) rotateX(${tilt}deg) rotateY(${ang}deg)`;
+                if (!rm) requestAnimationFrame(loop);
+            })();
+            if (rm) ring.style.transform = `translateZ(-${R}px)`;
+
+            // ===== Lời chúc chạy ở đầu trang =====
+            const w = document.getElementById("w"); let k = 0; w.textContent = W[0];
+            setInterval(() => {
+                w.classList.add("out");
+                setTimeout(() => { k = (k + 1) % W.length; w.textContent = W[k]; w.classList.remove("out") }, 600);
+            }, 4500);
+
+            // ===== Sao + hoa + cánh hoa =====
+            function rs() {
+                c.width = innerWidth; c.height = innerHeight;
+                const ns = mobile ? 45 : 90;
+                S = Array.from({ length: ns }, () => ({ x: Math.random() * c.width, y: Math.random() * c.height, r: Math.random() * 1.5 + .3, p: Math.random() * 6 }));
+            }
+            rs(); addEventListener("resize", rs);
+
+            const COL = [[330, 90, 72], [290, 80, 78], [20, 95, 72], [48, 95, 70], [350, 85, 65], [200, 80, 78]];
+            const back = t => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2) };
+            function mk() {
+                const n = Math.max(mobile ? 5 : 8, Math.round(c.width / (mobile ? 80 : 70)));
+                const sc = mobile ? .85 : 1;
+                F = Array.from({ length: n }, (_, i) => ({
+                    x: (i + .5) * c.width / n + (Math.random() - .5) * 30,
+                    h: c.height * (.1 + Math.random() * (mobile ? .14 : .2)),
+                    r: (16 + Math.random() * 14) * sc,
+                    n: 6 + (i % 3) * 2, col: COL[i % COL.length], p: Math.random() * 6,
+                    t0: 600 + i * 260, a: Math.random(), sp: .8 + Math.random() * .6
+                }));
+            }
+            mk(); addEventListener("resize", mk);
+
+            function petalShape(len, wd) { x.beginPath(); x.moveTo(0, 0); x.bezierCurveTo(wd, -len * .25, wd * .9, -len * .85, 0, -len); x.bezierCurveTo(-wd * .9, -len * .85, -wd, -len * .25, 0, 0) }
+            function leaf(px, py, s, rot, sw) { x.save(); x.translate(px, py); x.rotate(rot + sw * .02); x.fillStyle = "#26c58a"; x.beginPath(); x.moveTo(0, 0); x.quadraticCurveTo(s * .6, -s * .5, s * 1.4, -s * .1); x.quadraticCurveTo(s * .6, s * .4, 0, 0); x.fill(); x.restore() }
+            function layer(f, n, len, wd, rot, hue, l1, l2, al) {
+                const [h, s] = f.col;
+                for (let i = 0; i < n; i++) {
+                    x.save(); x.rotate(rot + i * 6.2832 / n);
+                    const g = x.createLinearGradient(0, 0, 0, -len);
+                    g.addColorStop(0, `hsl(${h + hue},${s}%,${l1}%)`); g.addColorStop(1, `hsl(${h + hue},${s}%,${l2}%)`);
+                    x.fillStyle = g; x.globalAlpha = al; petalShape(len, wd); x.fill();
+                    x.strokeStyle = `hsla(${h},${s}%,95%,.35)`; x.lineWidth = .8; x.beginPath(); x.moveTo(0, -len * .15); x.lineTo(0, -len * .75); x.stroke(); x.restore();
+                }
+            }
+            function flower(f, t) {
+                const g = Math.min(1, (t - f.t0) / 2200); if (g <= 0) return;
+                const H = c.height, sw = Math.sin(t / 1400 * f.sp + f.p) * 10 * g, ty = H - f.h * g, tx = f.x + sw;
+                const sg = x.createLinearGradient(0, H, 0, ty); sg.addColorStop(0, "#128a62"); sg.addColorStop(1, "#3be0a2");
+                x.globalAlpha = 1; x.strokeStyle = sg; x.lineWidth = 3.2; x.lineCap = "round"; x.beginPath(); x.moveTo(f.x, H); x.quadraticCurveTo(f.x, H - f.h * g * .5, tx, ty); x.stroke();
+                const lx2 = f.x + (tx - f.x) * .3; leaf(lx2, H - f.h * g * .35, 14 * g, -.5, sw); leaf(lx2, H - f.h * g * .55, 11 * g, Math.PI + .5, sw);
+                const b = Math.max(0, (g - .5) / .5); if (!b) return; const e = Math.min(1.08, back(b));
+                x.save(); x.translate(tx, ty); x.rotate(sw / 55);
+                const br = 1 + Math.sin(t / 500 * f.sp + f.p) * .05, sc = e * br; x.scale(sc, sc);
+                const gl = x.createRadialGradient(0, 0, 0, 0, 0, f.r * 1.8); gl.addColorStop(0, `hsla(${f.col[0]},90%,75%,.35)`); gl.addColorStop(1, "transparent");
+                x.globalAlpha = 1; x.fillStyle = gl; x.beginPath(); x.arc(0, 0, f.r * 1.8, 0, 7); x.fill();
+                const spin = t / 7000 * (f.a > .5 ? 1 : -1);
+                layer(f, f.n, f.r * 1.15, f.r * .42, spin, -12, 52, 82, .9);
+                layer(f, f.n, f.r * .8, f.r * .34, spin * -1.6 + .4, 8, 62, 90, .95);
+                const cg = x.createRadialGradient(0, 0, 0, 0, 0, f.r * .28); cg.addColorStop(0, "#fff3b0"); cg.addColorStop(1, "#ffb62e");
+                x.fillStyle = cg;
+                if (!mobile) { x.shadowColor = "#ffd34d"; x.shadowBlur = 12 }
+                x.beginPath(); x.arc(0, 0, f.r * .26, 0, 7); x.fill(); x.shadowBlur = 0;
+                x.fillStyle = "#c9791a"; for (let i = 0; i < 7; i++) { const a = i * 2.4, d = f.r * .13; x.beginPath(); x.arc(Math.cos(a) * d, Math.sin(a) * d, 1.3, 0, 7); x.fill() }
+                x.restore();
+                if (g >= 1) {
+                    for (let i = 0; i < 3; i++) {
+                        const a = t / 900 + f.p + i * 2.1, d = f.r * (1.5 + .3 * Math.sin(t / 400 + i)), kk = .5 + .5 * Math.sin(t / 300 + f.p * 3 + i * 2);
+                        x.globalAlpha = kk; x.fillStyle = "#fff"; x.beginPath(); x.arc(tx + Math.cos(a) * d, ty + Math.sin(a) * d, 1.6 * kk + .4, 0, 7); x.fill();
+                    }
+                    x.globalAlpha = 1;
+                }
+            }
+
+            function petal(px, py, burst) {
+                if (P.length > (mobile ? 90 : 220)) return;
+                P.push({ x: px ?? Math.random() * c.width, y: py ?? -10, vx: burst ? (Math.random() - .5) * 9 : Math.random() * 1.2 - .6, vy: burst ? -Math.random() * 9 - 2 : Math.random() * 1 + .6, s: Math.random() * 8 + 6, a: Math.random() * 6, va: (Math.random() - .5) * .1, h: Math.random() < .5 ? 330 : 290, g: burst ? .18 : 0 });
+            }
+            function draw(t) {
+                x.clearRect(0, 0, c.width, c.height);
+                S.forEach(s => { x.globalAlpha = .4 + .6 * Math.abs(Math.sin(t / 900 + s.p)); x.fillStyle = "#fff"; x.beginPath(); x.arc(s.x, s.y, s.r, 0, 7); x.fill() });
+                F.forEach(f => flower(f, t));
+                if (!rm && Math.random() < (mobile ? .07 : .12)) petal();
+                P = P.filter(p => p.y < c.height + 20);
+                P.forEach(p => { p.vy += p.g; p.x += p.vx + Math.sin(p.y / 40); p.y += p.vy; p.a += p.va; x.save(); x.translate(p.x, p.y); x.rotate(p.a); x.globalAlpha = .85; x.fillStyle = `hsl(${p.h},85%,75%)`; x.beginPath(); x.ellipse(0, 0, p.s * .5, p.s, 0, 0, 7); x.fill(); x.restore() });
+                requestAnimationFrame(draw);
+            }
+            requestAnimationFrame(draw);
+
+            // ===== Âm thanh =====
+            const bgm = document.getElementById("bgm"), mu = document.getElementById("mu");
+            let muted = false, ac;
+            bgm.volume = .5;
+
+            function setMu(on) {
+                mu.textContent = on ? "🔊 Tắt nhạc" : "🔇 Bật nhạc";
+                mu.setAttribute("aria-pressed", on);
+            }
+            function playBgm() { bgm.play().then(() => setMu(true)).catch(() => setMu(false)) }
+
+            // tự tạm dừng nhạc khi chuyển tab / khóa màn hình, quay lại thì phát tiếp
+            let wasPlaying = false;
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) { wasPlaying = !bgm.paused; bgm.pause() }
+                else if (wasPlaying && !muted) playBgm();
+            });
+
+            const gate = document.getElementById("gate"), go = document.getElementById("go");
+            go.onclick = () => { muted = false; playBgm(); gate.classList.add("off"); pop() };
+            go.focus({ preventScroll: true });
+
+            mu.onclick = () => {
+                if (bgm.paused) { muted = false; playBgm() }
+                else { muted = true; bgm.pause(); setMu(false) }
+            };
+
+            function tone(f, t0, d, v = .15, type = "sine") {
+                if (muted) return;
+                try {
+                    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+                    if (ac.state === "suspended") ac.resume();
+                    const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + t0;
+                    o.type = type; o.frequency.value = f;
+                    g.gain.setValueAtTime(0, t);
+                    g.gain.linearRampToValueAtTime(v, t + .02);
+                    g.gain.exponentialRampToValueAtTime(.001, t + d);
+                    o.connect(g); g.connect(ac.destination);
+                    o.start(t); o.stop(t + d + .05);
+                } catch (_) { }
+            }
+            const chime = () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, i * .09, 1));
+            const pop = () => { tone(520, 0, .12, .12, "triangle"); tone(780, .05, .15, .1, "triangle") };
+
+            // ===== Danh sách người nhận + lời chúc riêng =====
+            // c: cách xưng hô | g: nhóm | img: tên file trong /images/chandung/ | w: [đoạn 1, đoạn 2, đoạn 3]
+            const PEOPLE = [
+                {
+                    id: "linh", n: "Ms Linh", g: "IT", img: "linh.jpeg", w: [
+                        "Nhân ngày 20/10, anh em IT & IS xin gửi tới Ms Linh lời cảm ơn chân thành nhất. Có mọi người ở đây, phòng IT luôn có một điểm tựa vững vàng, điềm tĩnh và đáng tin cậy mỗi khi hệ thống \"nổi giận\".",
+                        "Chúc Ms Linh luôn xinh đẹp, khỏe mạnh, công việc thuận buồm xuôi gió và gia đình lúc nào cũng đầy ắp tiếng cười. Mong mọi dự định của Ms Linh trong năm tới đều về đích đúng hạn.",
+                        "Chúc Ms Linh mỗi ngày đều \"uptime 100%\", niềm vui luôn \"online\" và hạnh phúc được \"deploy\" thành công! 💐"]
+                },
+                {
+                    id: "hue", n: "Mrs Huệ", g: "IT", img: "hue.jpeg", w: [
+                        "Gửi Mrs Huệ — người luôn mang đến cho phòng IT sự dịu dàng và ấm áp. Cảm ơn Mrs Huệ đã luôn nhẹ nhàng cổ vũ, giúp đỡ anh em những lúc bận rộn nhất.",
+                        "Chúc Mrs Huệ ngày càng xinh tươi như đóa hoa, sức khỏe dồi dào, công việc suôn sẻ và được mọi người yêu thương, trân trọng thật nhiều.",
+                        "Chúc Mrs Huệ luôn \"thơm\" hương hạnh phúc, tình yêu không \"lỗi hệ thống\" và mọi điều tốt đẹp đều được \"deploy\" trọn vẹn! 🌸"]
+                },
+                {
+                    id: "nga", n: "Ms Nga", g: "IT", img: "nga.jpeg", w: [
+                        "Gửi Ms Nga của phòng IT! Cảm ơn vì luôn là nguồn năng lượng vui vẻ, nhiệt tình, làm không khí văn phòng lúc nào cũng rộn ràng tiếng cười.",
+                        "Nhân ngày 20/10, chúc Ms Nga luôn xinh đẹp, tự tin, mạnh khỏe; công việc thăng tiến và mọi ước mơ đều sớm thành hiện thực.",
+                        "Chúc Ms Nga hạnh phúc luôn \"online\" và tình yêu \"không lỗi hệ thống\" nhé! ✨"]
+                },
+                {
+                    id: "dung", n: "Ms Dung", g: "IT", img: "dung.jpeg", w: [
+                        "Gửi Ms Dung — người nhiệt huyết của phòng IT! Cảm ơn Ms Dung đã luôn chăm chỉ, ham học hỏi và mang đến cho anh chị em thêm nhiều niềm vui mỗi ngày.",
+                        "Chúc Ms Dung luôn xinh xắn, tự tin, khỏe mạnh; học hỏi thật nhiều, tiến bộ thật nhanh và gặp thật nhiều may mắn trên con đường phía trước.",
+                        "Chúc Ms Dung mỗi ngày đều là một bản \"update\" tuyệt vời hơn hôm qua, và niềm vui luôn \"load\" thật nhanh! 🌷"]
+                },
+                {
+                    id: "hai", n: "Mrs Hải", g: "IT", img: "hai.jpeg", w: [
+                        "Gửi Mrs Hải — người mạnh mẽ và đầy bản lĩnh của phòng IT. Cảm ơn Mrs Hải đã luôn gánh vác, chia sẻ và là chỗ dựa tin cậy của cả nhóm.",
+                        "Chúc Mrs Hải luôn rạng rỡ, sức khỏe viên mãn, sự nghiệp vững vàng như biển lớn, và gia đình mãi bình yên, hạnh phúc.",
+                        "Chúc Mrs Hải luôn \"băng thông rộng\" cho niềm vui, \"ping thấp\" với muộn phiền, và mọi điều tốt đẹp đều \"deploy\" thành công! 🌊"]
+                },
+                {
+                    id: "nguyet", n: "Ms Nguyệt", g: "IT", img: "nguyet.jpeg", w: [
+                        "Gửi Ms Nguyệt — dịu dàng và tỏa sáng như vầng trăng của phòng IT. Cảm ơn Ms Nguyệt đã luôn nhẹ nhàng, chu đáo và làm việc thật tận tâm.",
+                        "Chúc Ms Nguyệt luôn xinh đẹp, bình an, khỏe mạnh; công việc thuận lợi và mọi đêm trăng tròn trong đời đều ngập tràn niềm vui.",
+                        "Chúc Ms Nguyệt luôn \"sáng\" như trăng rằm, hạnh phúc \"online\" 24/7 và tình yêu \"không lỗi hệ thống\"! 🌙"]
+                },
+                {
+                    id: "lananh", n: "Ms Lan Anh", g: "IT", img: "lananh.jpeg", w: [
+                        "Gửi Ms Lan Anh — cô em tươi sáng của phòng IT! Cảm ơn Ms Lan Anh đã mang nụ cười và sự trẻ trung đến cho cả đội mỗi ngày.",
+                        "Chúc Ms Lan Anh luôn xinh đẹp, tự tin, khỏe mạnh; công việc thuận lợi, học hỏi không ngừng và mọi ước mơ đều nở hoa.",
+                        "Chúc Ms Lan Anh như đóa lan thanh tú: luôn rạng rỡ, bình an, và mọi điều tốt đẹp đều được \"deploy\" thành công! 🌺"]
+                },
+                {
+                    id: "hien", n: "Mrs Hiền", g: "IT", img: "hien.jpeg", w: [
+                        "Gửi Mrs Hiền — người hiền hòa, tinh tế của phòng IT. Cảm ơn Mrs Hiền đã luôn lắng nghe, thấu hiểu và giữ cho tập thể mình thêm gắn kết.",
+                        "Chúc Mrs Hiền luôn xinh đẹp, an yên, sức khỏe dồi dào; công việc hanh thông và gia đình mãi ngập tràn tiếng cười.",
+                        "Chúc Mrs Hiền mọi sự đều \"auto-backup\" bình an, hạnh phúc luôn \"online\" và may mắn \"sync\" mãi bên chị em! 🌼"]
+                },
+                {
+                    id: "thom", n: "Mrs Thơm", g: "IS", img: "thom.jpeg", w: [
+                        "Gửi Mrs Thơm của phòng IS! Cảm ơn Mrs Thơm đã luôn tận tâm, cẩn thận và giữ cho hệ thống của cả công ty vận hành trơn tru.",
+                        "Chúc Mrs Thơm luôn \"thơm\" ngát hương thành công, xinh đẹp, khỏe mạnh, gia đình êm ấm và mỗi ngày đi làm đều là một ngày vui.",
+                        "Chúc Mrs Thơm hệ thống luôn ổn định, niềm vui không \"downtime\" và hạnh phúc được \"deploy\" thành công! 🍍"]
+                },
+                {
+                    id: "sen", n: "Mrs Sen", g: "IS", img: "sen.jpeg", w: [
+                        "Gửi Mrs Sen của phòng IS! Như đóa sen giữa hồ, người luôn điềm đạm, thanh thoát và mang đến sự bình yên cho mọi người xung quanh.",
+                        "Chúc Mrs Sen luôn rạng rỡ, thanh lịch, sức khỏe viên mãn; công việc thuận lợi và cuộc sống mãi tràn đầy niềm vui, yêu thương.",
+                        "Chúc Mrs Sen bảo mật luôn vững, tâm luôn an, tình yêu \"không lỗi hệ thống\" và hạnh phúc \"online\" mỗi ngày! 🪷"]
+                },
+                {
+                    id: "lan", n: "Mrs Lan", g: "IS", img: "lan.jpeg", w: [
+                        "Gửi Mrs Lan của phòng IS! Cảm ơn Mrs Lan đã luôn chu đáo, nhiệt tình .",
+                        "Chúc Mrs Lan như đóa lan quý: thanh lịch, rạng rỡ, khỏe mạnh; sự nghiệp nở rộ và gia đình luôn đầm ấm, hạnh phúc.",
+                        "Chúc Mrs Lan luôn gặp nhiều may mắn, hệ thống ổn định, hạnh phúc \"online\" và mọi điều tốt đẹp đều \"deploy\" thành công! 🌸"]
+                }
+            ];
+            const GRP = { IT: "PHÒNG IT", IS: "PHÒNG IS", KHAC: "KHÁC" };
+
+            const pl = document.getElementById("pl");
+            ["IT", "IS"].forEach(g => {
+                const t = document.createElement("div"); t.className = "grp"; t.textContent = GRP[g];
+                const box = document.createElement("div"); box.className = "chips";
+                PEOPLE.filter(p => p.g === g).forEach(p => {
+                    const b = document.createElement("button");
+                    b.type = "button"; b.className = "chip"; b.textContent = p.n;
+                    b.onclick = () => choose(p);
+                    box.appendChild(b);
+                });
+                pl.append(t, box);
+            });
+
+            // Khách mời: nhập tên (không bắt buộc) rồi mở thiệp
+            (() => {
+                const t = document.createElement("div"); t.className = "grp"; t.textContent = GRP.KHAC;
+                const box = document.createElement("div"); box.className = "chips";
+                const row = document.createElement("div"); row.className = "guest";
+                const inp = document.createElement("input");
+                inp.type = "text"; inp.placeholder = "Tên của bạn (tuỳ chọn)"; inp.maxLength = 24;
+                inp.autocomplete = "off"; inp.enterKeyHint = "go"; inp.setAttribute("aria-label", "Tên khách mời");
+                const btn = document.createElement("button");
+                btn.type = "button"; btn.textContent = "Khách mời 💐";
+                const go2 = () => chooseGuest(inp.value);
+                btn.onclick = go2;
+                inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); go2() } });
+                row.append(inp, btn); box.appendChild(row);
+                pl.append(t, box);
+            })();
+
+            const env = document.getElementById("env"), eb = document.getElementById("eb"), eh = document.getElementById("eh");
+            const lph = document.getElementById("lph"), lphi = document.getElementById("lphi"), lphe = document.getElementById("lphe");
+            const lh = document.getElementById("lh"), l1 = document.getElementById("l1"), l2 = document.getElementById("l2"), l3 = document.getElementById("l3"), lto = document.getElementById("lto");
+            const lt = document.getElementById("lt");
+
+            function setPhoto(src, emoji) {
+                lph.classList.remove("none"); lphe.style.display = "none"; lphi.onerror = null;
+                if (src) {
+                    lphi.onerror = () => { lph.classList.add("none"); lphe.style.display = ""; lphe.textContent = emoji };
+                    lphi.src = src;
+                } else { lph.classList.add("none"); lphe.style.display = ""; lphe.textContent = emoji }
+            }
+            function show() {
+                lt.scrollTop = 0;
+                env.dataset.step = "letter";
+                eb.classList.remove("open");
+                eh.textContent = "Chạm vào phong bì để mở thiệp ✨";
+                env.scrollTop = 0;
+                pop();
+            }
+            function choose(p) {
+                setPhoto(p.img ? PB + p.img : null, "🌷");
+                lh.textContent = `Gửi ${p.n} xinh đẹp của phòng ${p.g} 🌸`;
+                l1.textContent = p.w[0]; l2.textContent = p.w[1]; l3.textContent = p.w[2];
+                lto.textContent = "— Các anh em IT & IS · VPIC1 —";
+                show();
+            }
+            function chooseGuest(raw) {
+                const name = (raw || "").trim().replace(/\s+/g, " ");
+                const who = name ? name : "bạn";
+                const to = name ? name : "người bạn xinh đẹp";
+                setPhoto(null, "💐");
+                lh.textContent = `Gửi ${to} 🌸`;
+                l1.textContent = `Nhân ngày Phụ nữ Việt Nam 20/10, tập thể anh em IT & IS xin gửi đến ${who} những lời chúc tốt đẹp và chân thành nhất. Cảm ơn ${who} đã luôn mang đến nguồn năng lượng tích cực và những nụ cười rạng rỡ cho mọi người xung quanh.`;
+                l2.textContent = `Chúc ${who} luôn xinh đẹp, tự tin, mạnh khỏe và hạnh phúc; công việc thuận lợi, cuộc sống ngập tràn niềm vui và luôn được yêu thương, trân trọng. Mong mọi ước mơ của ${who} đều sớm trở thành hiện thực.`;
+                l3.textContent = `Đặc biệt, chúc ${who} luôn gặp nhiều may mắn, tình yêu luôn "không lỗi hệ thống", hạnh phúc luôn "online" và mọi điều tốt đẹp đều được "deploy" thành công! 💐`;
+                lto.textContent = "— Phòng IT & IS · VPIC1 —";
+                show();
+            }
+
+            // ===== Phong bì =====
+            function openEnv() { env.dataset.step = "pick"; env.classList.add("on"); eb.classList.remove("open"); env.scrollTop = 0 }
+            function toggleEnv() {
+                const o = eb.classList.toggle("open");
+                eh.textContent = o ? "Chúc một ngày 20/10 thật ngọt ngào 🌷" : "Chạm vào phong bì để mở thiệp ✨";
+                if (o) { chime(); for (let i = 0; i < (mobile ? 30 : 60); i++) petal(c.width / 2, c.height * .75, true) }
+            }
+            function closeEnv() { env.classList.remove("on"); eb.classList.remove("open"); env.dataset.step = "pick" }
+            document.getElementById("b").onclick = openEnv;
+            document.getElementById("envb").onclick = () => { eb.classList.remove("open"); env.dataset.step = "pick"; env.scrollTop = 0 };
+            eb.onclick = e => { if (e.target.closest(".letter") && eb.classList.contains("open")) return; toggleEnv() };
+            eb.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleEnv() } });
+            document.getElementById("envx").onclick = closeEnv;
+            addEventListener("keydown", e => { if (e.key === "Escape") { lb.classList.remove("on"); closeEnv() } });
+        })();
+    </script>
+</body>
+
+</html>
